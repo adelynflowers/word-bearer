@@ -1,2 +1,12 @@
 .venv
 .env
+*__pycache__*
+.vscode
+jobs*
+config*
+results*
+scripts*
+leagues*
+assets*
+logfile
+.ruff_cache*
