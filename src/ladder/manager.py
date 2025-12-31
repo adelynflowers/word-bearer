@@ -90,6 +90,7 @@ class LadderManager:
     league_name: str
     config_file: pathlib.Path
     posting_day: IsoWeekday
+    posting_enabled: bool
 
     def __init__(
         self,
@@ -100,6 +101,7 @@ class LadderManager:
         league_name: str,
         config_dir: str,
         posting_day: IsoWeekday,
+        posting_enabled: bool,
     ):
         """Initializes the class and ensures parent directories are created.
 
@@ -124,6 +126,7 @@ class LadderManager:
         self.config_file.parent.mkdir(parents=True, exist_ok=True)
         self.results_path.parent.mkdir(parents=True, exist_ok=True)
         self.posting_day = posting_day
+        self.posting_enabled = posting_enabled
 
     def _read_results(self) -> list[LadderResult]:
         """
@@ -176,6 +179,8 @@ class LadderManager:
         Posts standings if it is the correct time and
         this week's message hasn't been posted already.
         """
+        if not self.posting_enabled:
+            return
         # is today after 5PM UTC (12 EST) on the weekday for posting messages, and before the end of
         # the league?
         now = datetime.datetime.now(tz=ZoneInfo("UTC"))

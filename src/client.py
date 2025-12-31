@@ -50,6 +50,7 @@ class LeagueConfig(BaseModel):
     league_name: str
     channel_id: int
     posting_day: int
+    posting_enabled: bool
 
 
 class WordBearerClient(discord.Client):
@@ -101,6 +102,7 @@ class WordBearerClient(discord.Client):
                     league_name=league_config.league_name,
                     config_dir=str(Path(self.league_dir, "messages")),
                     posting_day=IsoWeekday(league_config.posting_day),
+                    posting_enabled=league_config.posting_enabled,
                 )
                 self.leagues[manager.league_name] = manager
 
