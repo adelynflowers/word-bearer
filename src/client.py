@@ -62,7 +62,12 @@ class WordBearerClient(discord.Client):
     leagues: dict[str, LadderManager] = {}
     league_dir: str
 
-    def __init__(self, job_dir: str, finished_job_dir: str, league_dir: str) -> None:
+    def __init__(
+        self,
+        job_dir: str,
+        finished_job_dir: str,
+        league_dir: str,
+    ) -> None:
         """
         Sets class members from passed values and then initializes the list of leagues.
         """
@@ -72,7 +77,6 @@ class WordBearerClient(discord.Client):
         self.tree = app_commands.CommandTree(self)
         self.message_handler = MessageJobHandler(job_dir, finished_job_dir, self)
         self.league_dir = league_dir
-        self._setup_leagues()
 
     def _setup_leagues(self):
         """
@@ -140,6 +144,8 @@ class WordBearerClient(discord.Client):
         A 30 second job loop, used to send messages
         and post standings when needed.
         """
+        self._setup_leagues()
+        self.message_handler.load_jobs()
         await self.message_handler.run_jobs()
         for league in self.leagues.values():
             await league.post_standings()

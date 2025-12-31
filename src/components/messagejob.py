@@ -37,6 +37,7 @@ class MessageJobHandler:
     finished_dir: str = "/jobs/finished"
     jobs: dict[str, MessageJob] = {}
     client: discord.Client
+    debug: bool
 
     def __init__(self, job_dir: str, finished_dir: str, client: discord.Client):
         """Initializes the class
@@ -50,7 +51,6 @@ class MessageJobHandler:
         self.finished_dir = finished_dir
         self.client = client
         self._ensure_dirs()
-        self._load_jobs()
 
     def _ensure_dirs(self):
         """
@@ -69,7 +69,9 @@ class MessageJobHandler:
         Raises:
             RuntimeError: If the channel for the job isn't valid
         """
-        logger.info(f"Running MessageJob with id {job.id}")
+        logger.info(
+            f"Running MessageJob with id {job.id} and timestamp {job.timestamp}"
+        )
         channel = self.client.get_channel(job.channel_id)
         if not channel:
             return
@@ -100,7 +102,7 @@ class MessageJobHandler:
         if os.path.exists(job_path):
             shutil.move(job_path, f"{self.finished_dir}/{job.id}.json")
 
-    def _load_jobs(self):
+    def load_jobs(self):
         """
         Loads jobs from the queue directory
         """
