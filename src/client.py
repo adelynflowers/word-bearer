@@ -132,11 +132,7 @@ class WordBearerClient(discord.Client):
         def submission_callback(s):
             self.write_ladder_result(adapt_submission(s))
 
-        self.tree.add_command(
-            MatchCommands(
-                self, callback=submission_callback, managers=list(self.leagues.values())
-            )
-        )
+        self.tree.add_command(MatchCommands(self, callback=submission_callback))
         self.job_runner.start()
         await self.tree.sync()
 
@@ -171,14 +167,12 @@ class MatchCommands(app_commands.Group):
 
     def __init__(
         self,
-        client: discord.Client,
+        client: WordBearerClient,
         callback: Callable[[MatchSubmission], None],
-        managers: list[LadderManager],
     ):
         super().__init__(name="match")
         self.client = client
         self.submission_callback = callback
-        self.managers = managers
 
     def _active_leagues(self):
         """
@@ -187,8 +181,9 @@ class MatchCommands(app_commands.Group):
         this as a field.
         """
         leagues = []
-        now = datetime.now(tz=ZoneInfo("UTC"))
-        for manager in self.managers:
+        now = datetime.now(tz=ZoneInfo("America/New_York"))
+        for manager in self.client.leagues.values():
+            logger.debug(f"Checking if {now} >= {manager.config.start_date}")
             if now >= manager.config.start_date and now <= manager.config.end_date:
                 leagues.append(manager.league_name)
         if len(leagues) == 0:
